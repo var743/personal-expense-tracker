@@ -125,89 +125,43 @@ function addExpense() {
         document.getElementById("amount").value = "";
     }
 }
-async function loadExpenses() {
-  // 1. Create variables first - this fixes your error
-  let categoryData = {};
-  let totalExpense = 0;
-  
-  try {
-    // 2. Get data from backend
-    const response = await fetch("http://localhost:3000/expenses");
-    const expenses = await response.json();
-    console.log(expenses);
+document.addEventListener("DOMContentLoaded", showHistory);
+window.showHistory = async function () {
+    try {
+        const res = await fetch("http://localhost:3000/getExpenses");
+        const expenses = await res.json();
 
-    // 3. Clear old table rows first
-    const tableBody = document.getElementById("expenseTableBody");
-    tableBody.innerHTML = "";
+        console.log("History Data:", expenses); // DEBUG IMPORTANT
 
-    // 4. Loop and display each expense
-    expenses.forEach(exp => {
-      // Calculate totals
-      if (!categoryData[exp.category]) {
-        categoryData[exp.category] = 0;
-      }
-      categoryData[exp.category] += exp.amount;
-      totalExpense += exp.amount;
+        let table = document.getElementById("historyTable");
 
-      // Add row to table
-      const row = `<tr>
-        <td>${exp.category}</td>
-        <td>₹${exp.amount}</td>
-        <td>${new Date(exp.date).toLocaleDateString()}</td>
-      </tr>`;
-      tableBody.innerHTML += row;
-    });
+        if (!table) {
+            console.log("ERROR: historyTable not found in HTML");
+            return;
+        }
 
-    // 5. Update total
-    document.getElementById("totalExpense").innerText = `Total: ₹${totalExpense}`;
+        table.innerHTML = `
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        `;
 
-  } catch (error) {
-    console.log("Error loading expenses:", error);
-  }
-}
+        if (expenses.length === 0) {
+            table.innerHTML += `<tr><td colspan="3">No data found</td></tr>`;
+            return;
+        }
 
-// Call this when page loads
-loadExpenses();
-// This makes loadExpenses run automatically when page loads
-document.addEventListener("DOMContentLoaded", loadExpenses);
-// 1. Your form submit code - keep this on top
-document.getElementById("expenseForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  // ...your POST code...
-  loadExpenses(); // add this line at end to refresh table
-});
+        expenses.forEach(expense => {
+            let row = table.insertRow();
+            row.insertCell(0).innerText = expense.category;
+            row.insertCell(1).innerText = "₹" + expense.amount;
+            row.insertCell(2).innerText =
+                new Date(expense.date).toLocaleDateString();
+        });
 
-// 2. PASTE THE loadExpenses FUNCTION HERE - below the form code
-async function loadExpenses() {
-  let categoryData = {};
-  let totalExpense = 0;
-  // ...rest of code I gave you...
-}
-
-// 3. PASTE THIS LINE AT VERY BOTTOM - last line of file
-document.addEventListener("DOMContentLoaded", loadExpenses);
-async function showHistory() {
-    document.getElementById("historySection").style.display = "block";
-
-    const response = await fetch("http://localhost:3000/getExpenses");
-    const expenses = await response.json();
-
-    let table = document.getElementById("historyTable");
-
-    table.innerHTML = `
-        <tr>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Date</th>
-        </tr>
-    `;
-
-    expenses.forEach(expense => {
-        let row = table.insertRow();
-
-        row.insertCell(0).innerText = expense.category;
-        row.insertCell(1).innerText = "₹" + expense.amount;
-        row.insertCell(2).innerText =
-            new Date(expense.date).toLocaleDateString();
-    });
-}
+    } catch (err) {
+        console.log("Show History Error:", err);
+    }
+};

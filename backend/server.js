@@ -6,21 +6,33 @@ const Expense = require("./models/Expense");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, "../")));
 
+// Routes
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../index.html"));
 });
+
+// 🔥 IMPORTANT: MongoDB Atlas Connection
 mongoose.connect("mongodb+srv://varshini:varshini2007@cluster0.sb231xe.mongodb.net/expenseTracker?retryWrites=true&w=majority")
 .then(() => {
     console.log("Database Connected");
 })
 .catch((err) => {
-    console.log(err);
+    console.log("MongoDB Error:", err.message);
 });
+
+// 🔥 IMPORTANT: Server MUST run independently (FIX)
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
+});
+
+// ---------------- API ROUTES ----------------
+
+// Add Expense
 app.post("/addExpense", async (req, res) => {
     try {
         const expense = new Expense(req.body);
@@ -35,6 +47,8 @@ app.post("/addExpense", async (req, res) => {
         });
     }
 });
+
+// Get Expenses
 app.get("/getExpenses", async (req, res) => {
     try {
         const expenses = await Expense.find();
@@ -44,7 +58,4 @@ app.get("/getExpenses", async (req, res) => {
             message: error.message
         });
     }
-});
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
 });
