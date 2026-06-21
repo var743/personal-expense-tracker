@@ -128,7 +128,7 @@ function addExpense() {
 document.addEventListener("DOMContentLoaded", showHistory);
 window.showHistory = async function () {
     try {
-        const res = await fetch("http://localhost:3000/getExpenses");
+        const res = await fetch("https://personal-expense-tracker-p4vw.onrender.com");
         const expenses = await res.json();
 
         console.log("History Data:", expenses); // DEBUG IMPORTANT
