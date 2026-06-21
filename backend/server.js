@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, "../")));
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../index.html"));
 });
-mongoose.connect("mongodb://127.0.0.1:27017/expenseTracker")
+
 mongoose.connect("mongodb+srv://varshini:2007@cluster0.xxxxx.mongodb.net/expenseTracker?retryWrites=true&w=majority")
 .then(() => {
     console.log("Database Connected");
