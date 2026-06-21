@@ -128,17 +128,14 @@ function addExpense() {
 document.addEventListener("DOMContentLoaded", showHistory);
 window.showHistory = async function () {
     try {
-        const res = await fetch("https://personal-expense-tracker-p4vw.onrender.com");
+        const res = await fetch("https://personal-expense-tracker-p4vw.onrender.com/getExpenses");
         const expenses = await res.json();
 
-        console.log("History Data:", expenses); // DEBUG IMPORTANT
+        console.log("History Data:", expenses);
 
-        let table = document.getElementById("historyTable");
+        const table = document.getElementById("historyTable");
 
-        if (!table) {
-            console.log("ERROR: historyTable not found in HTML");
-            return;
-        }
+        if (!table) return;
 
         table.innerHTML = `
             <tr>
@@ -148,7 +145,7 @@ window.showHistory = async function () {
             </tr>
         `;
 
-        if (expenses.length === 0) {
+        if (!expenses || expenses.length === 0) {
             table.innerHTML += `<tr><td colspan="3">No data found</td></tr>`;
             return;
         }
